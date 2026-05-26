@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WOD LOG — CrossFit Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--surface:#131313;--surface2:#1c1c1c;--surface3:#242424;
+  --accent:#e8ff47;--accent2:#ff6b35;--text:#f0f0f0;--muted:#888;--border:#2a2a2a;
+  --green:#4ade80;--red:#f87171;--blue:#60a5fa;--orange:#fb923c;--purple:#c084fc;
+  --font-display:'Bebas Neue',sans-serif;--font-body:'DM Sans',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden}
+
+/* ===== NAV ===== */
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.logo{font-family:var(--font-display);font-size:22px;letter-spacing:2px;color:var(--accent);cursor:pointer}
+.nav-tabs{display:flex;gap:4px}
+.nav-tab{background:none;border:none;color:var(--muted);font-family:var(--font-body);font-size:13px;font-weight:500;padding:6px 14px;border-radius:6px;cursor:pointer;transition:all .2s}
+.nav-tab:hover{color:var(--text);background:var(--surface2)}
+.nav-tab.active{color:var(--accent);background:rgba(232,255,71,.08)}
+.streak-badge{background:var(--accent2);color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;font-family:var(--font-mono);white-space:nowrap}
+.nav-right{display:flex;align-items:center;gap:10px}
+
+/* ===== PAGES ===== */
+.page{display:none;padding:24px;max-width:960px;margin:0 auto}
+.page.active{display:block}
+.section-title{font-family:var(--font-display);font-size:32px;letter-spacing:2px;color:var(--text);line-height:1}
+.section-sub{color:var(--muted);font-size:13px;margin-top:4px}
+.section-header{margin-bottom:20px}
+
+/* ===== CARDS ===== */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.card-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:14px}
+
+/* ===== GRID ===== */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+/* ===== STAT CARDS ===== */
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.stat-value{font-family:var(--font-mono);font-size:22px;font-weight:500;color:var(--text)}
+.stat-unit{font-size:12px;color:var(--muted);margin-left:4px}
+
+/* ===== FORMS ===== */
+label{display:block;font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+input[type=text],input[type=number],input[type=date],input[type=password],select,textarea{
+  width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-family:var(--font-body);font-size:14px;padding:10px 12px;outline:none;transition:border .2s
+}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select option{background:var(--surface2)}
+textarea{resize:vertical;min-height:80px}
+.form-row{margin-bottom:14px}
+
+/* ===== BUTTONS ===== */
+.btn{border:none;border-radius:8px;font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;padding:10px 20px;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--accent);color:#0a0a0a}
+.btn-primary:hover{background:#d4eb00;transform:translateY(-1px)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--surface3)}
+.btn-danger{background:rgba(248,113,113,.12);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-accent2{background:var(--accent2);color:#fff}
+.btn-purple{background:rgba(192,132,252,.15);color:var(--purple);border:1px solid rgba(192,132,252,.3)}
+.btn-purple:hover{background:rgba(192,132,252,.25)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* ===== MOVEMENT TAGS ===== */
+.tag{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;margin:3px;cursor:pointer;transition:all .2s}
+.tag:hover{border-color:var(--accent);color:var(--accent)}
+.tag.selected{background:rgba(232,255,71,.1);border-color:var(--accent);color:var(--accent)}
+.tag-cat{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px;display:block}
+
+/* ===== MOVEMENT PICKER ===== */
+.search-box{position:relative;margin-bottom:14px}
+.search-box input{padding-left:36px}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.movement-picker{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;max-height:260px;overflow-y:auto}
+.selected-movements{display:flex;flex-wrap:wrap;gap:6px;min-height:40px;background:var(--surface3);border-radius:8px;padding:8px;margin-bottom:10px;border:1px solid var(--border)}
+.selected-tag{background:rgba(232,255,71,.1);border:1px solid rgba(232,255,71,.3);color:var(--accent);border-radius:6px;padding:4px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px}
+.selected-tag button{background:none;border:none;color:var(--accent);cursor:pointer;font-size:14px;line-height:1;padding:0}
+.cat-section{margin-bottom:12px}
+
+/* ===== WEEK GRID ===== */
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:16px}
+.day-cell{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 6px;text-align:center;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.day-cell.done{background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.3)}
+.day-cell.today{border-color:var(--accent);background:rgba(232,255,71,.05)}
+.day-cell.rest{opacity:.4}
+.day-name{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.day-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.day-num{font-size:16px;font-weight:600;font-family:var(--font-mono)}
+
+/* ===== LOG HISTORY ===== */
+.log-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.log-date{font-family:var(--font-mono);font-size:11px;color:var(--accent)}
+.log-movements{font-size:13px;color:var(--muted);margin-top:4px}
+.log-stats{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.log-stat{font-size:11px;color:var(--muted)}
+.log-stat span{color:var(--text);font-weight:500}
+
+/* ===== PR TABLE ===== */
+.pr-table{width:100%;border-collapse:collapse}
+.pr-table th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--border);padding:8px 12px}
+.pr-table td{padding:10px 12px;border-bottom:1px solid rgba(42,42,42,.5);font-size:13px}
+.pr-table tr:last-child td{border-bottom:none}
+.pr-badge{background:rgba(232,255,71,.1);color:var(--accent);font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:var(--font-mono)}
+
+/* ===== INNER TABS ===== */
+.inner-tabs{display:flex;gap:6px;margin-bottom:18px;background:var(--surface2);border-radius:8px;padding:4px}
+.inner-tab{flex:1;padding:8px;border-radius:6px;border:none;background:none;color:var(--muted);font-family:var(--font-body);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
+.inner-tab.active{background:var(--surface3);color:var(--text)}
+
+/* ===== PLAN PHASE ===== */
+.plan-phase{background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:10px}
+.phase-name{font-size:13px;font-weight:600;color:var(--text)}
+.phase-desc{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.6}
+
+/* ===== CHART AREA ===== */
+.chart-area{height:100px;background:var(--surface2);border-radius:8px;display:flex;align-items:flex-end;gap:5px;padding:10px;overflow:hidden}
+.bar{flex:1;border-radius:3px 3px 0 0;min-height:4px;background:var(--accent);opacity:.7;transition:opacity .2s}
+.bar:hover{opacity:1}
+
+/* ===== WHITEBOARD SCANNER ===== */
+.scan-dropzone{border:2px dashed var(--border);border-radius:12px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.scan-dropzone:hover,.scan-dropzone.drag{border-color:var(--accent);background:rgba(232,255,71,.03)}
+.scan-dropzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.scan-icon{font-size:40px;margin-bottom:12px}
+.scan-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px}
+.scan-sub{font-size:13px;color:var(--muted)}
+.scan-preview{width:100%;max-height:280px;object-fit:contain;border-radius:8px;margin-top:12px;border:1px solid var(--border)}
+.scan-result{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:14px;font-family:var(--font-mono);font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap;min-height:80px}
+
+/* ===== WOD EXERCISE ROWS ===== */
+.wod-exercise-row{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.wod-ex-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.wod-ex-name{font-size:15px;font-weight:600;color:var(--text)}
+.wod-ex-prescribed{font-size:12px;color:var(--muted);margin-top:2px}
+.wod-ex-inputs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.wod-ex-input-group label{font-size:10px;margin-bottom:4px}
+.mod-badge{background:rgba(192,132,252,.1);color:var(--purple);font-size:10px;padding:2px 8px;border-radius:4px;border:1px solid rgba(192,132,252,.2)}
+
+/* ===== API KEY SETUP ===== */
+.api-setup{background:rgba(232,255,71,.05);border:1px solid rgba(232,255,71,.2);border-radius:12px;padding:20px}
+.api-key-input{font-family:var(--font-mono);font-size:13px}
+.api-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:20px}
+.api-status.ok{background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.2)}
+.api-status.none{background:rgba(136,136,136,.1);color:var(--muted);border:1px solid var(--border)}
+
+/* ===== LOADING SPINNER ===== */
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scan-loading{display:flex;flex-direction:column;align-items:center;gap:12px;padding:30px;color:var(--muted);font-size:13px}
+.scan-loading .scan-text{animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ===== TOAST ===== */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:14px;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:10px;max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--surface)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:640px){
+  .grid2,.grid3,.grid4{grid-template-columns:1fr}
+  .week-grid{gap:4px}
+  .day-cell{min-height:58px;padding:6px 3px}
+  .day-num{font-size:13px}
+  nav{padding:0 12px}
+  .nav-tab{padding:5px 10px;font-size:12px}
+  .page{padding:16px}
+  .wod-ex-inputs{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="logo" onclick="showPage('log',this)">WOD LOG</span>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('log',this)">Daily Log</button>
+    <button class="nav-tab" onclick="showPage('scan',this)">📷 Scan WOD</button>
+    <button class="nav-tab" onclick="showPage('prs',this)">PRs</button>
+    <button class="nav-tab" onclick="showPage('history',this)">History</button>
+    <button class="nav-tab" onclick="showPage('health',this)">Health Plan</button>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-sm btn-secondary" onclick="showPage('settings',this)" title="API Key Settings">⚙️</button>
+    <span class="streak-badge" id="streak-badge">🔥 0-day streak</span>
+  </div>
+</nav>
+
+<!-- ===================== SCAN WOD PAGE ===================== -->
+<div class="page" id="page-scan">
+  <div class="section-header" style="margin-top:20px">
+    <div class="section-title">SCAN WHITEBOARD</div>
+    <div class="section-sub">Take a photo of the whiteboard WOD — AI reads it and sets up your log</div>
+  </div>
+
+  <!-- API Key Check -->
+  <div id="scan-api-warning" style="display:none" class="card" style="border-color:rgba(251,146,60,.3)">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:24px">🔑</span>
+      <div>
+        <div style="font-weight:600;margin-bottom:4px">Anthropic API Key Required</div>
+        <div style="font-size:13px;color:var(--muted)">Image recognition uses Claude Vision. Add your key in <button class="btn btn-sm btn-secondary" onclick="showPage('settings',document.querySelector('.nav-tab'))">⚙️ Settings</button> — it's stored locally in your browser only.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Zone -->
+  <div class="card">
+    <div class="card-title">Upload or Capture Whiteboard Photo</div>
+    <div class="scan-dropzone" id="scan-dropzone">
+      <input type="file" accept="image/*" capture="environment" id="scan-file-input" onchange="handleImageUpload(event)">
+      <div class="scan-icon">📸</div>
+      <div class="scan-title">Tap to take photo or upload image</div>
+      <div class="scan-sub">Supports JPG, PNG, HEIC from camera or gallery</div>
+    </div>
+    <img id="scan-preview" class="scan-preview" style="display:none" alt="Whiteboard preview">
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn btn-purple" id="scan-btn" onclick="scanWhiteboard()" disabled>
+        <span id="scan-btn-icon">✨</span> Analyse Whiteboard
+      </button>
+      <button class="btn btn-secondary btn-sm" onclick="clearScan()">Clear</button>
+    </div>
+  </div>
+
+  <!-- AI Result -->
+  <div id="scan-result-area" style="display:none">
+    <div class="card">
+      <div class="card-title">AI Reading — Confirm & Edit</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Edit any misreads below, then click "Build WOD Log" to fill in your session.</div>
+      <div contenteditable="true" id="scan-text-result" class="scan-result" spellcheck="false"></div>
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="buildWodFromScan()">⚡ Build WOD Log from this</button>
+        <button class="btn btn-secondary btn-sm" onclick="rescanImage()">🔄 Re-scan</button>
+      </div>
+    </div>
+
+    <!-- Parsed Exercise Rows -->
+    <div id="wod-builder-area" style="display:none">
+      <div class="card">
+        <div class="card-title">Log Your Performance — Exercise by Exercise</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:14px">Enter your actual reps, weight, and any modifications. Unrecognised movements are auto-matched to the nearest in the library.</div>
+        <div id="wod-exercise-rows"></div>
+        <div class="form-row" style="margin-top:8px">
+          <label>Add Movement</label>
+          <div style="display:flex;gap:8px">
+            <select id="extra-movement-select" style="flex:1">
+              <option value="">+ Add extra movement...</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="addExtraMovement()">Add</button>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">
+          <div class="grid3">
+            <div class="form-row"><label>WOD Type</label><select id="wod-type-select"><option>AMRAP</option><option>For Time</option><option>EMOM</option><option>Chipper</option><option>Ladder</option><option>Tabata</option><option>21-15-9</option><option>Strength Focus</option><option>Hero WOD</option><option>Benchmark</option><option>Custom</option></select></div>
+            <div class="form-row"><label>Total Duration (min)</label><input type="number" id="wod-duration" placeholder="45"></div>
+            <div class="form-row"><label>Overall Score / Result</label><input type="text" id="wod-score" placeholder="e.g. 12 rounds + 5, 18:42"></div>
+          </div>
+          <div class="grid2">
+            <div class="form-row"><label>Intensity (1–10)</label>
+              <input type="range" id="wod-intensity" min="1" max="10" value="7" oninput="document.getElementById('wod-int-val').textContent=this.value">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px"><span>Easy</span><span id="wod-int-val" style="color:var(--accent);font-weight:600">7</span><span>Max</span></div>
+            </div>
+            <div class="form-row"><label>How You Felt</label><select id="wod-feel"><option value="5">💪 Crushed it</option><option value="4">😊 Good session</option><option value="3" selected>😐 Average</option><option value="2">😓 Tough day</option><option value="1">😵 Struggled</option></select></div>
+          </div>
+          <div class="form-row"><label>Notes</label><textarea id="wod-notes" placeholder="Scaling used, form cues, things to improve..."></textarea></div>
+          <button class="btn btn-primary" style="margin-top:4px" onclick="saveFromScan()">💾 Save This Session</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== DAILY LOG PAGE ===================== -->
+<div class="page active" id="page-log">
+  <div class="section-header" style="margin-top:20px">
+    <div class="section-title">DAILY LOG</div>
+    <div class="section-sub" id="today-date"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">This Week — 6-Day Schedule</div>
+    <div class="week-grid" id="week-grid"></div>
+    <div style="display:flex;gap:16px;margin-top:4px">
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><div style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div>Done</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><div style="width:8px;height:8px;border-radius:50%;background:var(--accent)"></div>Today</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><div style="width:8px;height:8px;border-radius:50%;background:var(--muted)"></div>Rest (Sun)</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Body Metrics</div>
+    <div class="grid3">
+      <div class="form-row"><label>Body Weight (kg)</label><input type="number" id="inp-weight" step="0.1" placeholder="75.0" oninput="calcMetrics()"></div>
+      <div class="form-row"><label>Height (cm)</label><input type="number" id="inp-height" placeholder="175" oninput="calcMetrics()"></div>
+      <div class="form-row"><label>Yesterday's Protein (g)</label><input type="number" id="inp-protein" placeholder="180" oninput="calcMetrics()"></div>
+    </div>
+    <div class="grid4">
+      <div class="stat-card"><div class="stat-label">BMI</div><div class="stat-value" id="bmi-val">—</div></div>
+      <div class="stat-card"><div class="stat-label">Protein Goal</div><div class="stat-value" id="protein-goal">—</div><div style="font-size:11px;color:var(--muted);margin-top:3px">2×bw (g)</div></div>
+      <div class="stat-card"><div class="stat-label">Protein Status</div><div class="stat-value" id="protein-status" style="font-size:16px">—</div></div>
+      <div class="stat-card"><div class="stat-label">TDEE Est.</div><div class="stat-value" id="tdee-val">—</div><div style="font-size:11px;color:var(--muted);margin-top:3px">kcal/day</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Today's WOD</div>
+    <div style="margin-bottom:14px;padding:12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:13px;color:var(--muted)">Have a whiteboard photo? Use the scanner for faster logging.</div>
+      <button class="btn btn-purple btn-sm" onclick="showPage('scan',document.querySelectorAll('.nav-tab')[1])">📷 Scan WOD</button>
+    </div>
+    <div class="form-row"><label>Workout Type</label>
+      <select id="inp-wod-type"><option value="">Select type...</option><option>AMRAP</option><option>For Time</option><option>EMOM</option><option>Chipper</option><option>Ladder</option><option>Tabata</option><option>21-15-9</option><option>Strength Focus</option><option>Hero WOD</option><option>Benchmark / Girl WOD</option><option>Open WOD</option><option>Custom</option></select>
+    </div>
+    <div class="form-row">
+      <label>Movements Performed</label>
+      <div class="selected-movements" id="selected-movements"><span style="color:var(--muted);font-size:12px;align-self:center">Select movements below...</span></div>
+      <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="movement-search" placeholder="Search 120+ CrossFit movements..." oninput="filterMovements()"></div>
+      <div class="movement-picker" id="movement-picker"></div>
+    </div>
+    <div class="grid2">
+      <div class="form-row"><label>Duration (min)</label><input type="number" id="inp-duration" placeholder="45"></div>
+      <div class="form-row"><label>Intensity (1–10)</label>
+        <input type="range" id="inp-intensity" min="1" max="10" value="7" oninput="document.getElementById('int-val').textContent=this.value" style="margin-top:8px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px"><span>Easy</span><span id="int-val" style="color:var(--accent);font-weight:600">7</span><span>Max</span></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="form-row"><label>Score / Result</label><input type="text" id="inp-score" placeholder="12 rounds + 5, 18:42..."></div>
+      <div class="form-row"><label>How You Felt</label><select id="inp-feel"><option value="5">💪 Crushed it</option><option value="4">😊 Good session</option><option value="3" selected>😐 Average</option><option value="2">😓 Tough day</option><option value="1">😵 Struggled</option></select></div>
+    </div>
+    <div class="form-row"><label>Notes</label><textarea id="inp-notes" placeholder="Form cues, scaling, areas to improve..."></textarea></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" onclick="saveLog()">💾 Save Today's Log</button>
+      <button class="btn btn-secondary" onclick="clearForm()">Clear</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PRs PAGE ===================== -->
+<div class="page" id="page-prs">
+  <div class="section-header" style="margin-top:20px">
+    <div class="section-title">PERSONAL RECORDS</div>
+    <div class="section-sub">1RM data, lifting PRs &amp; benchmark times</div>
+  </div>
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="switchInnerTab('prs','lifts',this)">Weightlifting PRs</button>
+    <button class="inner-tab" onclick="switchInnerTab('prs','benchmarks',this)">Benchmark WODs</button>
+    <button class="inner-tab" onclick="switchInnerTab('prs','add',this)">Log New PR</button>
+  </div>
+
+  <div id="prs-tab-lifts">
+    <div class="card">
+      <div class="card-title">1RM &amp; Max Lift Records</div>
+      <div class="form-row"><label>Filter</label><select id="pr-filter" onchange="renderPRTable()"><option value="">All lifts</option></select></div>
+      <table class="pr-table"><thead><tr><th>Movement</th><th>Best 1RM</th><th>Recent</th><th>Date</th><th>Notes</th></tr></thead><tbody id="pr-table-body"></tbody></table>
+      <div id="pr-empty" style="text-align:center;padding:30px;color:var(--muted);font-size:13px">No PRs logged yet.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">% Calculator</div>
+      <div class="grid3">
+        <div class="form-row"><label>1RM (kg)</label><input type="number" id="calc-1rm" placeholder="100" oninput="calcPercents()"></div>
+        <div class="form-row"><label>Target %</label><input type="number" id="calc-pct" placeholder="85" oninput="calcPercents()"></div>
+        <div class="stat-card" style="display:flex;flex-direction:column;justify-content:center"><div class="stat-label">Working Weight</div><div class="stat-value" id="calc-result">—</div></div>
+      </div>
+      <div id="pct-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div id="prs-tab-benchmarks" style="display:none">
+    <div class="card"><div class="card-title">The Girls &amp; Hero WODs</div>
+      <table class="pr-table"><thead><tr><th>WOD</th><th>Description</th><th>Your Score</th><th>Date</th></tr></thead><tbody id="benchmark-body"></tbody></table>
+    </div>
+  </div>
+
+  <div id="prs-tab-add" style="display:none">
+    <div class="card"><div class="card-title">Log a New PR</div>
+      <div class="grid2">
+        <div class="form-row"><label>Movement</label><select id="pr-movement"><option value="">Select lift...</option></select></div>
+        <div class="form-row"><label>Weight (kg)</label><input type="number" id="pr-weight" placeholder="100" step="0.5"></div>
+      </div>
+      <div class="grid2">
+        <div class="form-row"><label>Lift Type</label><select id="pr-type"><option>1RM</option><option>3RM</option><option>5RM</option><option>Max Reps</option><option>Recent Test</option></select></div>
+        <div class="form-row"><label>Date</label><input type="date" id="pr-date"></div>
+      </div>
+      <div class="form-row"><label>Notes</label><input type="text" id="pr-notes" placeholder="Paused, belt, conditions..."></div>
+      <button class="btn btn-primary" onclick="savePR()">Save PR</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== HISTORY PAGE ===================== -->
+<div class="page" id="page-history">
+  <div class="section-header" style="margin-top:20px">
+    <div class="section-title">HISTORY</div>
+    <div class="section-sub">All logged sessions</div>
+  </div>
+  <div class="grid4" style="margin-bottom:16px">
+    <div class="stat-card"><div class="stat-label">Total Sessions</div><div class="stat-value" id="hs-sessions">0</div></div>
+    <div class="stat-card"><div class="stat-label">This Month</div><div class="stat-value" id="hs-month">0</div></div>
+    <div class="stat-card"><div class="stat-label">Avg Intensity</div><div class="stat-value" id="hs-intensity">—</div></div>
+    <div class="stat-card"><div class="stat-label">Avg Duration</div><div class="stat-value" id="hs-duration">—</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Weight Trend (last 14 sessions)</div>
+    <div class="chart-area" id="weight-chart"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Session Log</div>
+    <div class="form-row"><input type="text" id="hist-search" placeholder="Search sessions..." oninput="renderHistory()"></div>
+    <div id="history-list" style="margin-top:14px"></div>
+  </div>
+</div>
+
+<!-- ===================== HEALTH PLAN PAGE ===================== -->
+<div class="page" id="page-health">
+  <div class="section-header" style="margin-top:20px">
+    <div class="section-title">HEALTH &amp; MUSCLE PLAN</div>
+    <div class="section-sub">Personalised for 6-day/week CrossFit athletes</div>
+  </div>
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="switchInnerTab('health','overview',this)">Overview</button>
+    <button class="inner-tab" onclick="switchInnerTab('health','nutrition',this)">Nutrition</button>
+    <button class="inner-tab" onclick="switchInnerTab('health','recovery',this)">Recovery</button>
+    <button class="inner-tab" onclick="switchInnerTab('health','program',this)">Training Plan</button>
+  </div>
+
+  <div id="health-tab-overview">
+    <div class="grid2">
+      <div class="card"><div class="card-title">Your Profile</div><div id="health-profile-display" style="color:var(--muted);font-size:13px">Log body metrics in Daily Log to see your profile.</div></div>
+      <div class="card"><div class="card-title">12-Week Phases</div>
+        <div class="plan-phase"><div class="phase-name">Weeks 1–4 · Strength Accumulation</div><div class="phase-desc">Build a strength base with compound lifts. Keep CrossFit intensity moderate. 2g protein/kg/day minimum.</div></div>
+        <div class="plan-phase" style="border-color:var(--accent2)"><div class="phase-name">Weeks 5–8 · Hypertrophy Block</div><div class="phase-desc">Volume-focused. 3–4 sets of 8–12 reps on accessory work. Caloric surplus of 200–300 kcal.</div></div>
+        <div class="plan-phase" style="border-color:var(--blue)"><div class="phase-name">Weeks 9–12 · Performance Peak</div><div class="phase-desc">Intensity up, volume down. Prioritize WOD performance and 1RM testing. Maintain protein.</div></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">Key Principles</div>
+      <div class="grid3">
+        <div style="background:var(--surface2);border-radius:8px;padding:14px"><div style="font-size:22px;margin-bottom:8px">🥩</div><div style="font-weight:600;font-size:14px;margin-bottom:6px">Protein First</div><div style="font-size:12px;color:var(--muted);line-height:1.6">2–2.4g/kg daily. Spread across 4–5 meals. Leucine-rich sources to maximise MPS.</div></div>
+        <div style="background:var(--surface2);border-radius:8px;padding:14px"><div style="font-size:22px;margin-bottom:8px">😴</div><div style="font-weight:600;font-size:14px;margin-bottom:6px">Sleep = Gains</div><div style="font-size:12px;color:var(--muted);line-height:1.6">7–9 hours mandatory. GH peaks in deep sleep. One bad night cuts testosterone by 15%.</div></div>
+        <div style="background:var(--surface2);border-radius:8px;padding:14px"><div style="font-size:22px;margin-bottom:8px">📈</div><div style="font-weight:600;font-size:14px;margin-bottom:6px">Progressive Overload</div><div style="font-size:12px;color:var(--muted);line-height:1.6">Track PRs. Add 2–5% load every 1–2 weeks. What doesn't get tracked doesn't improve.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="health-tab-nutrition" style="display:none">
+    <div class="card"><div class="card-title">Macro Targets</div><div id="macro-targets"><div style="color:var(--muted);font-size:13px">Log body weight in Daily Log to see personalised targets.</div></div></div>
+    <div class="card"><div class="card-title">Meal Timing</div>
+      <div class="plan-phase"><div class="phase-name">Pre-WOD (60–90 min before)</div><div class="phase-desc">30–40g carbs + 20g protein. Oats + protein shake, rice + chicken. Avoid high fat/fibre.</div></div>
+      <div class="plan-phase" style="border-color:var(--blue)"><div class="phase-name">Post-WOD (within 45 min)</div><div class="phase-desc">40–60g carbs + 30–40g protein immediately. Anabolic window — don't skip it.</div></div>
+      <div class="plan-phase" style="border-color:var(--orange)"><div class="phase-name">Before Sleep</div><div class="phase-desc">Casein protein 30–40g (cottage cheese, Greek yoghurt, casein shake). Sustains MPS overnight.</div></div>
+    </div>
+    <div class="card"><div class="card-title">Supplement Stack</div>
+      <div class="grid3">
+        <div style="background:var(--surface2);border-radius:8px;padding:12px"><div style="font-weight:600;font-size:13px;color:var(--accent)">Creatine Monohydrate</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5">5g/day. Most evidence-backed supplement for strength + power. Timing flexible.</div></div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px"><div style="font-weight:600;font-size:13px;color:var(--accent)">Caffeine</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5">3–6mg/kg BW, 30–60 min pre-WOD. Improves power output and pain tolerance.</div></div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px"><div style="font-weight:600;font-size:13px;color:var(--accent)">Omega-3 Fish Oil</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5">2–3g EPA+DHA daily. Reduces inflammation, supports joints. Take with meals.</div></div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px"><div style="font-weight:600;font-size:13px;color:var(--accent)">Vitamin D3 + K2</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5">2000–5000 IU D3 + 100mcg K2. Testosterone, bone density, immune function.</div></div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px"><div style="font-weight:600;font-size:13px;color:var(--accent)">Magnesium Glycinate</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5">300–400mg before bed. Improves sleep quality and muscle relaxation.</div></div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px"><div style="font-weight:600;font-size:13px;color:var(--accent)">Electrolytes</div><div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5">Na, K, Mg. Crucial for 6-day athletes. Himalayan salt in water pre-WOD.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="health-tab-recovery" style="display:none">
+    <div class="card"><div class="card-title">Recovery Protocol</div>
+      <div class="plan-phase"><div class="phase-name">Sleep Optimisation</div><div class="phase-desc">Fixed wake time. Room at 18–20°C. No screens 60 min before bed. Magnesium 30 min before sleep. 7–9 hours — GH is released and muscles repair here.</div></div>
+      <div class="plan-phase" style="border-color:var(--accent2)"><div class="phase-name">Active Recovery (Sunday)</div><div class="phase-desc">20–30 min walk, swim, or yoga. Light movement flushes lactate. Mobility work 15–20 min: hips, shoulders, thoracic spine.</div></div>
+      <div class="plan-phase" style="border-color:var(--blue)"><div class="phase-name">Cold &amp; Heat</div><div class="phase-desc">Cold shower 2–3 min post-WOD reduces inflammation. Sauna 2–3×/week (15–20 min at 80°C) boosts GH by 200–300%.</div></div>
+      <div class="plan-phase" style="border-color:var(--green)"><div class="phase-name">Deload Week (Every 4–6 Weeks)</div><div class="phase-desc">Cut volume 40–50%, keep intensity. Super-compensation happens here. Signs you need one: persistent soreness, poor sleep, motivation drops, WOD regression.</div></div>
+    </div>
+  </div>
+
+  <div id="health-tab-program" style="display:none">
+    <div class="card"><div class="card-title">Weekly Training Template — 6-Day Split</div>
+      <div class="plan-phase"><div class="phase-name">Monday — Lower Body Strength</div><div class="phase-desc">Back Squat 5×5 or Front Squat 4×4 + Deadlift variation. WOD with lower-body bias: thrusters, box jumps, lunges.</div></div>
+      <div class="plan-phase" style="border-color:var(--accent2)"><div class="phase-name">Tuesday — Upper Body Push + Pull</div><div class="phase-desc">Bench/Press + Pull-up strength work. Gymnastics skill (HSPU, muscle-ups). WOD: push/pull movements, 3–4 sets accessory.</div></div>
+      <div class="plan-phase" style="border-color:var(--blue)"><div class="phase-name">Wednesday — Olympic Lifting</div><div class="phase-desc">Snatch or Clean &amp; Jerk technique + heavy singles. Highest skill day — do when fresh. WOD: lighter aerobic bias conditioning.</div></div>
+      <div class="plan-phase" style="border-color:var(--green)"><div class="phase-name">Thursday — Aerobic Capacity</div><div class="phase-desc">Long AMRAP (20–30 min) or For Time with row/run/bike. Focus on pacing, breathing, aerobic engine development.</div></div>
+      <div class="plan-phase" style="border-color:var(--orange)"><div class="phase-name">Friday — Mixed Modal / Test Day</div><div class="phase-desc">Benchmark WOD (Fran, Helen, Diane) or PR attempt. Fresh from Wednesday. Track all scores — this is your progress marker.</div></div>
+      <div class="plan-phase" style="border-color:var(--muted)"><div class="phase-name">Saturday — Community / Partner WOD</div><div class="phase-desc">High-carb day to replenish glycogen. Enjoy the class. Moderate intensity — full week behind you.</div></div>
+      <div class="plan-phase" style="border-color:transparent;opacity:.5"><div class="phase-name">Sunday — Full Rest</div><div class="phase-desc">Meal prep. Sleep in. Hydrate. Recovery is part of training.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SETTINGS PAGE ===================== -->
+<div class="page" id="page-settings">
+  <div class="section-header" style="margin-top:20px">
+    <div class="section-title">SETTINGS</div>
+    <div class="section-sub">Configure API key for whiteboard scanning</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Anthropic API Key</div>
+    <div class="api-setup">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">
+        The whiteboard scanner uses <strong style="color:var(--text)">Claude Vision</strong> to read your gym's whiteboard.
+        Your API key is stored <strong style="color:var(--text)">only in your browser's localStorage</strong> — it is never sent to any server other than Anthropic's API directly from your device.
+      </p>
+      <div class="form-row">
+        <label>API Key</label>
+        <input type="password" id="api-key-input" class="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off">
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
+        <button class="btn btn-primary btn-sm" onclick="saveApiKey()">Save Key</button>
+        <button class="btn btn-secondary btn-sm" onclick="clearApiKey()">Clear Key</button>
+        <span id="api-key-status" class="api-status none">No key saved</span>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6">
+        Get your key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a> → API Keys. Each scan uses ~1,000–2,000 tokens (claude-haiku-3-5, very low cost ≈ $0.001 per scan).
+      </p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Data Management</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm" onclick="exportData()">📤 Export All Data (JSON)</button>
+      <button class="btn btn-danger btn-sm" onclick="clearAllData()">🗑 Clear All Data</button>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:12px">All data is stored locally in your browser. Export regularly to keep a backup.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toast-icon">✅</span> <span id="toast-msg">Saved!</span></div>
+
+<script>
+// ============================================================
+//  DATA & CONSTANTS
+// ============================================================
+const MOVEMENTS = {
+  'Olympic Lifting': ['Snatch','Clean','Clean & Jerk','Power Snatch','Power Clean','Hang Power Clean','Hang Power Snatch','Push Jerk','Split Jerk','Muscle Snatch','Squat Snatch','Squat Clean','Hang Squat Clean','Hang Squat Snatch'],
+  'Barbell': ['Back Squat','Front Squat','Overhead Squat','Deadlift','Sumo Deadlift','Romanian Deadlift','Bench Press','Strict Press','Push Press','Thruster','Good Morning','Barbell Row','Pendlay Row','Zercher Squat','Paused Back Squat'],
+  'Gymnastics': ['Pull-up','Chest-to-Bar Pull-up','Muscle-up (Bar)','Muscle-up (Ring)','Ring Dip','Handstand Push-up (HSPU)','Strict HSPU','Toes-to-Bar','Knees-to-Elbow','L-Sit','Ring Row','Push-up','Strict Pull-up','Pistol Squat','Wall Walk','Handstand Hold','Freestanding Handstand','Rope Climb','Legless Rope Climb','Box Jump'],
+  'Monostructural': ['Run 400m','Run 800m','Run 1600m','Row (Cal)','Row (meters)','Ski Erg (Cal)','Assault Bike (Cal)','Echo Bike (Cal)','Single-Unders','Double-Unders','Triple-Unders','Shuttle Run','Swim 100m'],
+  'Kettlebell': ['KB Swing (American)','KB Swing (Russian)','KB Clean','KB Snatch','KB Deadlift','KB Goblet Squat','KB Press','KB Turkish Get-up','KB Farmer Carry','KB Thruster','KB Row','KB Figure 8'],
+  'Dumbbell': ['DB Snatch','DB Clean & Jerk','DB Thruster','DB Step-up','DB Row','DB Press','DB Deadlift','DB Lateral Raise','DB Curl','DB Front Rack Lunge','DB Box Step-over'],
+  'Bodyweight': ['Burpee','Bar-facing Burpee','Burpee Box Jump','Jumping Lunges','Air Squat','Sit-up','GHD Sit-up','Back Extension','Bear Crawl','Broad Jump','Wall Ball Shot','Slam Ball','Sandbag Carry','Box Step-up','Step-up','V-up'],
+  'Core / Accessory': ['Plank','Side Plank','Dead Bug','Pallof Press','GHD Hip Extension','Nordic Curl','Ring Support Hold','False Grip Hold','Hollow Body Hold','Superman Hold','Banded Pull-apart','Face Pull','Hip Thrust','Single-leg RDL'],
+};
+
+const ALL_MOVEMENTS_FLAT = Object.values(MOVEMENTS).flat();
+
+const BENCHMARKS = {
+  'Fran':'21-15-9 Thrusters (43/29kg) + Pull-ups',
+  'Helen':'3 Rounds: 400m Run + 21 KB Swings (24kg) + 12 Pull-ups',
+  'Grace':'30 Clean & Jerks (60/43kg) For Time',
+  'Isabel':'30 Snatches (60/43kg) For Time',
+  'Annie':'50-40-30-20-10: Double-Unders + Sit-ups',
+  'Cindy':'20 min AMRAP: 5 Pull-ups / 10 Push-ups / 15 Air Squats',
+  'DT':'5 Rounds: 12 DL + 9 Hang Power Clean + 6 Push Jerk (70/47kg)',
+  'Diane':'21-15-9: Deadlift (102/70kg) + HSPU',
+  'Elizabeth':'21-15-9: Squat Clean (61/43kg) + Ring Dips',
+  'Karen':'150 Wall Balls (9/6kg) For Time',
+  'Linda':'10-9-8-7-6-5-4-3-2-1: Deadlift, Bench, Clean',
+  'Mary':'20 min AMRAP: 5 HSPU / 10 Pistols / 15 Pull-ups',
+  'Nancy':'5 Rounds: 400m Run + 15 Overhead Squats (43/29kg)',
+  'Amanda':'9-7-5: Ring Muscle-ups + Squat Snatches (61/43kg)',
+  'Barbara':'5 Rounds: 20 Pull-ups + 30 Push-ups + 40 Sit-ups + 50 Squats',
+};
+
+const LIFT_MOVEMENTS = ['Back Squat','Front Squat','Overhead Squat','Deadlift','Sumo Deadlift','Strict Press','Push Press','Bench Press','Snatch','Clean','Clean & Jerk','Power Snatch','Power Clean','Thruster','Romanian Deadlift'];
+
+let state = {
+  logs: JSON.parse(localStorage.getItem('wl_logs') || '[]'),
+  prs: JSON.parse(localStorage.getItem('wl_prs') || '[]'),
+  benchmarks: JSON.parse(localStorage.getItem('wl_benchmarks') || '{}'),
+};
+let selectedMovements = [];
+let scanImageBase64 = null;
+let parsedWodExercises = [];
+
+function saveState() {
+  localStorage.setItem('wl_logs', JSON.stringify(state.logs));
+  localStorage.setItem('wl_prs', JSON.stringify(state.prs));
+  localStorage.setItem('wl_benchmarks', JSON.stringify(state.benchmarks));
+}
+
+// ============================================================
+//  NAVIGATION
+// ============================================================
+function showPage(p, el) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  if (el && el.classList && el.classList.contains('nav-tab')) el.classList.add('active');
+  if (p === 'history') renderHistory();
+  if (p === 'prs') { renderPRTable(); renderBenchmarks(); }
+  if (p === 'health') renderHealthProfile();
+  if (p === 'scan') checkApiKeyForScan();
+  if (p === 'settings') loadApiKeyDisplay();
+}
+
+function switchInnerTab(page, tab, el) {
+  const prefix = page + '-tab-';
+  document.querySelectorAll('[id^="' + prefix + '"]').forEach(x => x.style.display = 'none');
+  document.getElementById(prefix + tab).style.display = 'block';
+  const parent = el ? el.closest('.inner-tabs') : null;
+  if (parent) parent.querySelectorAll('.inner-tab').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+function init() {
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  document.getElementById('pr-date').value = new Date().toISOString().split('T')[0];
+  renderWeekGrid();
+  renderMovementPicker();
+  populateDropdowns();
+  updateStreak();
+  checkApiKeyForScan();
+  const last = state.logs.filter(l => l.height).slice(-1)[0];
+  if (last) { document.getElementById('inp-height').value = last.height; calcMetrics(); }
+}
+
+function populateDropdowns() {
+  const prMove = document.getElementById('pr-movement');
+  const prFilter = document.getElementById('pr-filter');
+  const extraSel = document.getElementById('extra-movement-select');
+  LIFT_MOVEMENTS.forEach(m => {
+    prMove.innerHTML += `<option>${m}</option>`;
+    prFilter.innerHTML += `<option>${m}</option>`;
+  });
+  ALL_MOVEMENTS_FLAT.forEach(m => {
+    extraSel.innerHTML += `<option>${m}</option>`;
+  });
+}
+
+// ============================================================
+//  WEEK GRID
+// ============================================================
+function renderWeekGrid() {
+  const now = new Date();
+  const dow = now.getDay();
+  const mon = new Date(now); mon.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML = '';
+  const logDates = state.logs.map(l => l.date);
+  days.forEach((d, i) => {
+    const dt = new Date(mon); dt.setDate(mon.getDate() + i);
+    const ds = dt.toISOString().split('T')[0];
+    const isToday = dt.toDateString() === now.toDateString();
+    const isDone = logDates.includes(ds);
+    const isRest = i === 6;
+    const cell = document.createElement('div');
+    cell.className = 'day-cell' + (isDone ? ' done' : '') + (isToday ? ' today' : '') + (isRest ? ' rest' : '');
+    cell.innerHTML = `<div class="day-name">${d}</div><div class="day-num">${dt.getDate()}</div>${isDone ? '<div class="day-dot"></div>' : ''}${isToday && !isDone ? '<div style="font-size:9px;color:var(--accent)">NOW</div>' : ''}`;
+    grid.appendChild(cell);
+  });
+}
+
+// ============================================================
+//  MOVEMENT PICKER
+// ============================================================
+function renderMovementPicker(filter) {
+  const picker = document.getElementById('movement-picker');
+  picker.innerHTML = '';
+  const q = (filter || '').toLowerCase();
+  Object.entries(MOVEMENTS).forEach(([cat, moves]) => {
+    const filtered = q ? moves.filter(m => m.toLowerCase().includes(q)) : moves;
+    if (!filtered.length) return;
+    const sec = document.createElement('div'); sec.className = 'cat-section';
+    sec.innerHTML = `<span class="tag-cat">${cat}</span>`;
+    filtered.forEach(m => {
+      const t = document.createElement('span');
+      t.className = 'tag' + (selectedMovements.includes(m) ? ' selected' : '');
+      t.textContent = m;
+      t.onclick = () => toggleMovement(m);
+      sec.appendChild(t);
+    });
+    picker.appendChild(sec);
+  });
+}
+
+function toggleMovement(m) {
+  if (selectedMovements.includes(m)) selectedMovements = selectedMovements.filter(x => x !== m);
+  else selectedMovements.push(m);
+  renderMovementPicker(document.getElementById('movement-search').value);
+  renderSelectedMovements();
+}
+
+function renderSelectedMovements() {
+  const box = document.getElementById('selected-movements');
+  if (!selectedMovements.length) { box.innerHTML = '<span style="color:var(--muted);font-size:12px;align-self:center">Select movements below...</span>'; return; }
+  box.innerHTML = selectedMovements.map(m => `<span class="selected-tag">${m}<button onclick="toggleMovement('${m.replace(/'/g,"\\'")}')">×</button></span>`).join('');
+}
+
+function filterMovements() { renderMovementPicker(document.getElementById('movement-search').value); }
+
+// ============================================================
+//  METRICS
+// ============================================================
+function calcMetrics() {
+  const w = parseFloat(document.getElementById('inp-weight').value);
+  const h = parseFloat(document.getElementById('inp-height').value);
+  const p = parseFloat(document.getElementById('inp-protein').value);
+  if (w && h) {
+    document.getElementById('bmi-val').textContent = (w / ((h / 100) ** 2)).toFixed(1);
+    const goal = Math.round(w * 2);
+    document.getElementById('protein-goal').textContent = goal;
+    if (p) {
+      const diff = p - goal;
+      const el = document.getElementById('protein-status');
+      el.textContent = diff >= 0 ? '✓ Met' : Math.abs(diff) + 'g short';
+      el.style.color = diff >= 0 ? 'var(--green)' : 'var(--red)';
+    }
+    document.getElementById('tdee-val').textContent = Math.round((10 * w + 6.25 * h - 5 * 27 + 5) * 1.725);
+  }
+}
+
+// ============================================================
+//  SAVE LOG (manual)
+// ============================================================
+function saveLog() {
+  const w = document.getElementById('inp-weight').value;
+  const h = document.getElementById('inp-height').value;
+  const wtype = document.getElementById('inp-wod-type').value;
+  if (!selectedMovements.length && !wtype) { showToast('Select a workout type or movement.', '⚠️'); return; }
+  const log = {
+    date: new Date().toISOString().split('T')[0],
+    timestamp: Date.now(),
+    weight: parseFloat(w) || null,
+    height: parseFloat(h) || null,
+    protein: parseFloat(document.getElementById('inp-protein').value) || null,
+    wodType: wtype,
+    movements: [...selectedMovements],
+    duration: parseInt(document.getElementById('inp-duration').value) || null,
+    intensity: parseInt(document.getElementById('inp-intensity').value),
+    score: document.getElementById('inp-score').value,
+    feel: parseInt(document.getElementById('inp-feel').value),
+    notes: document.getElementById('inp-notes').value,
+    source: 'manual',
+  };
+  const idx = state.logs.findIndex(l => l.date === log.date);
+  if (idx >= 0) state.logs[idx] = log; else state.logs.push(log);
+  saveState(); renderWeekGrid(); updateStreak();
+  showToast("Today's log saved!", '✅'); clearForm();
+}
+
+function clearForm() {
+  ['inp-weight','inp-protein','inp-score','inp-notes','inp-duration'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('inp-wod-type').value = '';
+  document.getElementById('inp-intensity').value = 7;
+  document.getElementById('int-val').textContent = '7';
+  selectedMovements = []; renderSelectedMovements(); renderMovementPicker(); calcMetrics();
+}
+
+// ============================================================
+//  STREAK
+// ============================================================
+function updateStreak() {
+  const dates = state.logs.map(l => l.date).sort().reverse();
+  let streak = 0;
+  const today = new Date();
+  for (let i = 0; i < 60; i++) {
+    const d = new Date(today); d.setDate(today.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    if (dates.includes(ds)) streak++;
+    else if (i > 0) break;
+  }
+  document.getElementById('streak-badge').textContent = `🔥 ${streak}-day streak`;
+}
+
+// ============================================================
+//  API KEY
+// ============================================================
+function getApiKey() { return localStorage.getItem('wl_api_key') || ''; }
+
+function saveApiKey() {
+  const v = document.getElementById('api-key-input').value.trim();
+  if (!v) { showToast('Enter a key first.', '⚠️'); return; }
+  localStorage.setItem('wl_api_key', v);
+  loadApiKeyDisplay(); checkApiKeyForScan();
+  showToast('API key saved!', '🔑');
+}
+
+function clearApiKey() {
+  localStorage.removeItem('wl_api_key');
+  document.getElementById('api-key-input').value = '';
+  loadApiKeyDisplay(); checkApiKeyForScan();
+  showToast('API key cleared.', '🗑');
+}
+
+function loadApiKeyDisplay() {
+  const key = getApiKey();
+  const inp = document.getElementById('api-key-input');
+  const status = document.getElementById('api-key-status');
+  if (key) {
+    inp.value = key.slice(0, 12) + '••••••••••••••••••••••••••';
+    status.textContent = '✓ Key saved';
+    status.className = 'api-status ok';
+  } else {
+    inp.value = '';
+    status.textContent = 'No key saved';
+    status.className = 'api-status none';
+  }
+}
+
+function checkApiKeyForScan() {
+  const has = !!getApiKey();
+  const warn = document.getElementById('scan-api-warning');
+  if (warn) warn.style.display = has ? 'none' : 'block';
+  const btn = document.getElementById('scan-btn');
+  if (btn) btn.disabled = !has || !scanImageBase64;
+}
+
+// ============================================================
+//  IMAGE UPLOAD & SCAN
+// ============================================================
+function handleImageUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const dataUrl = ev.target.result;
+    scanImageBase64 = dataUrl.split(',')[1];
+    const preview = document.getElementById('scan-preview');
+    preview.src = dataUrl; preview.style.display = 'block';
+    document.getElementById('scan-result-area').style.display = 'none';
+    document.getElementById('wod-builder-area').style.display = 'none';
+    const btn = document.getElementById('scan-btn');
+    if (getApiKey()) btn.disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearScan() {
+  scanImageBase64 = null;
+  document.getElementById('scan-file-input').value = '';
+  document.getElementById('scan-preview').style.display = 'none';
+  document.getElementById('scan-result-area').style.display = 'none';
+  document.getElementById('scan-btn').disabled = true;
+  parsedWodExercises = [];
+}
+
+async function scanWhiteboard() {
+  const key = getApiKey();
+  if (!key) { showToast('Add your API key in Settings.', '🔑'); return; }
+  if (!scanImageBase64) { showToast('Upload an image first.', '⚠️'); return; }
+
+  const btn = document.getElementById('scan-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Analysing...';
+
+  const prompt = `You are a CrossFit whiteboard reader. Extract the workout exactly as written on the whiteboard.
+
+Return your response in this exact format:
+WOD_TYPE: [AMRAP/For Time/EMOM/Chipper/Strength/etc]
+DURATION: [if mentioned, e.g. 20 min]
+ROUNDS: [if mentioned]
+MOVEMENTS:
+- [Movement Name] | [Reps/Distance/Calories as written] | [Weight as written, or "bodyweight"]
+- [Movement Name] | [Reps/Distance/Calories as written] | [Weight as written, or "bodyweight"]
+NOTES: [Any scaling, time cap, or additional info written]
+
+Rules:
+- List every movement exactly as written
+- If reps are per round (e.g. AMRAP), show the per-round count
+- If it's 21-15-9 style, show "21-15-9" in reps field
+- Use standard CrossFit movement names where clear
+- If handwriting is unclear, write your best interpretation and add "(unclear)" after it
+- Do not add movements that aren't written`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: scanImageBase64 } },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const text = data.content.map(c => c.text || '').join('\n');
+    document.getElementById('scan-text-result').textContent = text;
+    document.getElementById('scan-result-area').style.display = 'block';
+    showToast('Whiteboard scanned!', '✅');
+  } catch (err) {
+    showToast('Scan failed: ' + err.message.slice(0, 60), '❌');
+    document.getElementById('scan-text-result').textContent = 'Error: ' + err.message + '\n\nCheck your API key in Settings and try again.';
+    document.getElementById('scan-result-area').style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>✨</span> Analyse Whiteboard';
+    if (!getApiKey() || !scanImageBase64) btn.disabled = true;
+  }
+}
+
+function rescanImage() { scanWhiteboard(); }
+
+// ============================================================
+//  BUILD WOD FROM SCAN TEXT
+// ============================================================
+function buildWodFromScan() {
+  const rawText = document.getElementById('scan-text-result').textContent;
+  parsedWodExercises = parseWodText(rawText);
+
+  // Set WOD type if detected
+  const typeMatch = rawText.match(/WOD_TYPE:\s*(.+)/i);
+  if (typeMatch) {
+    const sel = document.getElementById('wod-type-select');
+    const detected = typeMatch[1].trim();
+    for (let opt of sel.options) { if (opt.value.toLowerCase().includes(detected.toLowerCase())) { sel.value = opt.value; break; } }
+  }
+
+  renderWodExerciseRows();
+  document.getElementById('wod-builder-area').style.display = 'block';
+  document.getElementById('wod-builder-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function parseWodText(text) {
+  const lines = text.split('\n');
+  const exercises = [];
+  let inMovements = false;
+  for (const line of lines) {
+    if (/^MOVEMENTS:/i.test(line.trim())) { inMovements = true; continue; }
+    if (/^(WOD_TYPE|DURATION|ROUNDS|NOTES):/i.test(line.trim())) { inMovements = false; }
+    if (inMovements && line.trim().startsWith('-')) {
+      const parts = line.replace(/^[-•\s]+/, '').split('|');
+      const name = (parts[0] || '').trim();
+      const reps = (parts[1] || '').trim();
+      const weight = (parts[2] || '').trim();
+      if (name) {
+        const matched = fuzzyMatchMovement(name);
+        exercises.push({ name, matchedName: matched, reps, prescribedWeight: weight, actualReps: '', actualWeight: '', mod: '' });
+      }
+    }
+  }
+  return exercises;
+}
+
+function fuzzyMatchMovement(name) {
+  const n = name.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+  // exact match
+  let found = ALL_MOVEMENTS_FLAT.find(m => m.toLowerCase() === n);
+  if (found) return found;
+  // partial
+  found = ALL_MOVEMENTS_FLAT.find(m => m.toLowerCase().includes(n) || n.includes(m.toLowerCase().substring(0, 5)));
+  return found || name;
+}
+
+function renderWodExerciseRows() {
+  const container = document.getElementById('wod-exercise-rows');
+  container.innerHTML = '';
+  parsedWodExercises.forEach((ex, i) => {
+    const isMatched = ex.matchedName !== ex.name;
+    const div = document.createElement('div');
+    div.className = 'wod-exercise-row';
+    div.innerHTML = `
+      <div class="wod-ex-header">
+        <div>
+          <div class="wod-ex-name">${ex.matchedName}</div>
+          ${isMatched ? `<div class="wod-ex-prescribed" style="color:var(--purple)">Detected as: "${ex.name}"</div>` : ''}
+          ${ex.reps ? `<div class="wod-ex-prescribed">Prescribed: ${ex.reps}${ex.prescribedWeight && ex.prescribedWeight !== 'bodyweight' ? ' @ ' + ex.prescribedWeight : ''}</div>` : ''}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${ex.matchedName !== ex.name ? `<span class="mod-badge">matched</span>` : ''}
+          <button class="btn btn-danger btn-sm" onclick="removeWodRow(${i})">×</button>
+        </div>
+      </div>
+      <div class="wod-ex-inputs">
+        <div class="wod-ex-input-group form-row" style="margin:0">
+          <label>Actual Reps / Rounds</label>
+          <input type="text" placeholder="${ex.reps || 'e.g. 21-15-9'}" oninput="updateWodEx(${i},'actualReps',this.value)">
+        </div>
+        <div class="wod-ex-input-group form-row" style="margin:0">
+          <label>Weight Used (kg)</label>
+          <input type="number" step="0.5" placeholder="${ex.prescribedWeight || 'kg'}" oninput="updateWodEx(${i},'actualWeight',this.value)">
+        </div>
+        <div class="wod-ex-input-group form-row" style="margin:0">
+          <label>Modification</label>
+          <select onchange="updateWodEx(${i},'mod',this.value)">
+            <option value="">As prescribed (Rx)</option>
+            <option value="scaled">Scaled</option>
+            <option value="band assisted">Band assisted</option>
+            <option value="reduced weight">Reduced weight</option>
+            <option value="reduced reps">Reduced reps</option>
+            <option value="different movement">Different movement</option>
+          </select>
+        </div>
+        <div class="wod-ex-input-group form-row" style="margin:0">
+          <label>Override Movement</label>
+          <select onchange="overrideMovement(${i},this.value)">
+            <option value="">Keep: ${ex.matchedName.substring(0,22)}</option>
+            ${ALL_MOVEMENTS_FLAT.map(m => `<option value="${m}">${m}</option>`).join('')}
+          </select>
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+function updateWodEx(i, field, val) { if (parsedWodExercises[i]) parsedWodExercises[i][field] = val; }
+function removeWodRow(i) { parsedWodExercises.splice(i, 1); renderWodExerciseRows(); }
+function overrideMovement(i, val) { if (val && parsedWodExercises[i]) { parsedWodExercises[i].matchedName = val; renderWodExerciseRows(); } }
+
+function addExtraMovement() {
+  const sel = document.getElementById('extra-movement-select');
+  const m = sel.value;
+  if (!m) return;
+  parsedWodExercises.push({ name: m, matchedName: m, reps: '', prescribedWeight: '', actualReps: '', actualWeight: '', mod: '' });
+  renderWodExerciseRows();
+  sel.value = '';
+  document.getElementById('wod-exercise-rows').lastElementChild.scrollIntoView({ behavior: 'smooth' });
+}
+
+function saveFromScan() {
+  const movements = parsedWodExercises.map(e => e.matchedName);
+  if (!movements.length) { showToast('No movements to save.', '⚠️'); return; }
+
+  const w = document.getElementById('inp-weight').value;
+  const h = document.getElementById('inp-height').value;
+
+  const exerciseDetail = parsedWodExercises.map(e => ({
+    movement: e.matchedName,
+    prescribed: e.reps,
+    prescribedWeight: e.prescribedWeight,
+    actual: e.actualReps,
+    actualWeight: e.actualWeight,
+    mod: e.mod,
+  }));
+
+  const log = {
+    date: new Date().toISOString().split('T')[0],
+    timestamp: Date.now(),
+    weight: parseFloat(w) || null,
+    height: parseFloat(h) || null,
+    protein: parseFloat(document.getElementById('inp-protein').value) || null,
+    wodType: document.getElementById('wod-type-select').value,
+    movements,
+    exerciseDetail,
+    duration: parseInt(document.getElementById('wod-duration').value) || null,
+    intensity: parseInt(document.getElementById('wod-intensity').value),
+    score: document.getElementById('wod-score').value,
+    feel: parseInt(document.getElementById('wod-feel').value),
+    notes: document.getElementById('wod-notes').value,
+    source: 'scan',
+    scanText: document.getElementById('scan-text-result').textContent,
+  };
+
+  const idx = state.logs.findIndex(l => l.date === log.date);
+  if (idx >= 0) state.logs[idx] = log; else state.logs.push(log);
+  saveState(); renderWeekGrid(); updateStreak();
+  showToast('Session saved from scan!', '💾');
+  clearScan();
+  showPage('history', document.querySelectorAll('.nav-tab')[3]);
+}
+
+// ============================================================
+//  PRs
+// ============================================================
+function renderPRTable() {
+  const filter = document.getElementById('pr-filter').value;
+  const prs = filter ? state.prs.filter(p => p.movement === filter) : state.prs;
+  const body = document.getElementById('pr-table-body');
+  const empty = document.getElementById('pr-empty');
+  if (!prs.length) { body.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  const grouped = {};
+  prs.forEach(p => {
+    if (!grouped[p.movement]) grouped[p.movement] = { best: null, recent: null };
+    if (!grouped[p.movement].best || p.weight > grouped[p.movement].best.weight) grouped[p.movement].best = p;
+    if (!grouped[p.movement].recent || p.timestamp > grouped[p.movement].recent.timestamp) grouped[p.movement].recent = p;
+  });
+  body.innerHTML = Object.entries(grouped).map(([mv, data]) => {
+    const isPR = data.recent && data.best && data.recent.timestamp === data.best.timestamp;
+    return `<tr>
+      <td style="font-weight:500">${mv}</td>
+      <td><span class="pr-badge">${data.best.weight}kg</span> <span style="font-size:11px;color:var(--muted)">${data.best.type}</span></td>
+      <td>${data.recent.weight}kg ${isPR ? '<span style="color:var(--green);font-size:10px;font-weight:600">🎯 PR</span>' : ''}</td>
+      <td style="color:var(--muted);font-size:12px">${data.recent.date}</td>
+      <td style="color:var(--muted);font-size:12px">${data.recent.notes || '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function savePR() {
+  const mv = document.getElementById('pr-movement').value;
+  const wt = parseFloat(document.getElementById('pr-weight').value);
+  if (!mv || !wt) { showToast('Select movement and weight.', '⚠️'); return; }
+  state.prs.push({ movement: mv, weight: wt, type: document.getElementById('pr-type').value, date: document.getElementById('pr-date').value, notes: document.getElementById('pr-notes').value, timestamp: Date.now() });
+  saveState(); renderPRTable();
+  showToast(mv + ' ' + wt + 'kg saved!', '🏋️');
+  switchInnerTab('prs', 'lifts', document.querySelector('#page-prs .inner-tab'));
+}
+
+function calcPercents() {
+  const orm = parseFloat(document.getElementById('calc-1rm').value);
+  const pct = parseFloat(document.getElementById('calc-pct').value);
+  if (!orm) return;
+  document.getElementById('calc-result').textContent = (pct ? (orm * pct / 100).toFixed(1) : orm) + 'kg';
+  const pcts = [50, 60, 70, 75, 80, 85, 90, 95, 100];
+  document.getElementById('pct-grid').innerHTML = pcts.map(p => `<div class="stat-card" style="text-align:center"><div class="stat-label">${p}%</div><div style="font-family:var(--font-mono);font-size:14px;font-weight:500">${(orm * p / 100).toFixed(1)}kg</div></div>`).join('');
+}
+
+function renderBenchmarks() {
+  document.getElementById('benchmark-body').innerHTML = Object.entries(BENCHMARKS).map(([wod, desc]) => {
+    const saved = state.benchmarks[wod] || {};
+    return `<tr>
+      <td style="font-weight:500">${wod}</td>
+      <td style="color:var(--muted);font-size:12px;max-width:220px">${desc}</td>
+      <td><input type="text" value="${saved.score || ''}" placeholder="—" style="width:130px;padding:5px 8px;font-size:12px" onchange="saveBenchmark('${wod}',this.value)"></td>
+      <td style="color:var(--muted);font-size:12px">${saved.date || '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function saveBenchmark(wod, score) {
+  if (!score) return;
+  state.benchmarks[wod] = { score, date: new Date().toISOString().split('T')[0] };
+  saveState(); showToast(wod + ' result saved!', '🏅');
+}
+
+// ============================================================
+//  HISTORY
+// ============================================================
+function renderHistory() {
+  const q = (document.getElementById('hist-search').value || '').toLowerCase();
+  const logs = [...state.logs].reverse();
+  const filtered = q ? logs.filter(l => JSON.stringify(l).toLowerCase().includes(q)) : logs;
+
+  document.getElementById('hs-sessions').textContent = state.logs.length;
+  document.getElementById('hs-month').textContent = state.logs.filter(l => l.date.startsWith(new Date().toISOString().slice(0, 7))).length;
+  const withI = state.logs.filter(l => l.intensity);
+  document.getElementById('hs-intensity').textContent = withI.length ? Math.round(withI.reduce((s, l) => s + l.intensity, 0) / withI.length) : '—';
+  const withD = state.logs.filter(l => l.duration);
+  document.getElementById('hs-duration').innerHTML = withD.length ? Math.round(withD.reduce((s, l) => s + l.duration, 0) / withD.length) + '<span class="stat-unit">min</span>' : '—';
+
+  const wLogs = state.logs.filter(l => l.weight).slice(-14);
+  const chart = document.getElementById('weight-chart');
+  if (wLogs.length > 1) {
+    const min = Math.min(...wLogs.map(l => l.weight)) - 2;
+    const max = Math.max(...wLogs.map(l => l.weight)) + 2;
+    chart.innerHTML = wLogs.map(l => {
+      const pct = Math.max(4, Math.round((l.weight - min) / (max - min) * 100));
+      return `<div class="bar" style="height:${pct}%" title="${l.date}: ${l.weight}kg"></div>`;
+    }).join('');
+  } else { chart.innerHTML = '<div style="color:var(--muted);font-size:12px;align-self:center;width:100%;text-align:center">Log weight data to see trend</div>'; }
+
+  const list = document.getElementById('history-list');
+  if (!filtered.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px">No sessions yet.</div>'; return; }
+  list.innerHTML = filtered.map(l => `
+    <div class="log-item">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div class="log-date">${l.date} · ${l.wodType || 'WOD'}</div>
+        ${l.source === 'scan' ? '<span style="background:rgba(192,132,252,.15);color:var(--purple);font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid rgba(192,132,252,.2)">📷 Scanned</span>' : ''}
+      </div>
+      <div class="log-movements">${l.movements?.length ? l.movements.join(', ') : 'No movements listed'}</div>
+      ${l.exerciseDetail && l.exerciseDetail.length ? `<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">${l.exerciseDetail.filter(e=>e.actual||e.actualWeight).map(e=>`<span style="background:var(--surface3);border-radius:5px;padding:3px 8px;font-size:11px;color:var(--muted)">${e.movement}: <span style="color:var(--text)">${e.actual||e.prescribed}${e.actualWeight?' @ '+e.actualWeight+'kg':''}${e.mod?' ('+e.mod+')':''}</span></span>`).join('')}</div>` : ''}
+      <div class="log-stats">
+        ${l.weight ? `<div class="log-stat">⚖️ <span>${l.weight}kg</span></div>` : ''}
+        ${l.duration ? `<div class="log-stat">⏱ <span>${l.duration}min</span></div>` : ''}
+        ${l.score ? `<div class="log-stat">🎯 <span>${l.score}</span></div>` : ''}
+        ${l.intensity ? `<div class="log-stat">🔥 <span>${l.intensity}/10</span></div>` : ''}
+      </div>
+      ${l.notes ? `<div style="font-size:12px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${l.notes}</div>` : ''}
+    </div>`).join('');
+}
+
+// ============================================================
+//  HEALTH
+// ============================================================
+function renderHealthProfile() {
+  const last = state.logs.filter(l => l.weight).slice(-1)[0];
+  if (!last) return;
+  const w = last.weight; const h = last.height || 175;
+  const bmi = (w / ((h / 100) ** 2)).toFixed(1);
+  const protein = Math.round(w * 2);
+  const carbs = Math.round(w * 3.5);
+  const fat = Math.round(w * 1);
+  const kcal = Math.round(protein * 4 + carbs * 4 + fat * 9);
+
+  document.getElementById('health-profile-display').innerHTML = `
+    <div class="grid2" style="gap:10px">
+      <div class="stat-card"><div class="stat-label">Body Weight</div><div class="stat-value">${w}<span class="stat-unit">kg</span></div></div>
+      <div class="stat-card"><div class="stat-label">BMI</div><div class="stat-value">${bmi}</div></div>
+      <div class="stat-card"><div class="stat-label">Protein Target</div><div class="stat-value">${protein}<span class="stat-unit">g/day</span></div></div>
+      <div class="stat-card"><div class="stat-label">TDEE (active)</div><div class="stat-value">${Math.round((10*w+6.25*h-5*27+5)*1.725)}<span class="stat-unit">kcal</span></div></div>
+    </div>`;
+
+  document.getElementById('macro-targets').innerHTML = `
+    <div class="grid3" style="gap:12px">
+      <div style="background:rgba(232,255,71,.08);border:1px solid rgba(232,255,71,.2);border-radius:10px;padding:16px;text-align:center">
+        <div style="font-size:28px;font-weight:600;color:var(--accent);font-family:var(--font-mono)">${protein}g</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px">Protein · ${protein*4} kcal</div>
+      </div>
+      <div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:16px;text-align:center">
+        <div style="font-size:28px;font-weight:600;color:var(--blue);font-family:var(--font-mono)">${carbs}g</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px">Carbs · ${carbs*4} kcal</div>
+      </div>
+      <div style="background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.2);border-radius:10px;padding:16px;text-align:center">
+        <div style="font-size:28px;font-weight:600;color:var(--orange);font-family:var(--font-mono)">${fat}g</div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px">Fat · ${fat*9} kcal</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;background:var(--surface2);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:13px;color:var(--muted)">Total maintenance calories</div>
+      <div style="font-family:var(--font-mono);font-size:20px;font-weight:500">${kcal} kcal</div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">For muscle building: +200–300 kcal above TDEE. For fat loss: −200–300 kcal. Protein stays constant regardless of goal.</p>`;
+}
+
+// ============================================================
+//  DATA EXPORT / CLEAR
+// ============================================================
+function exportData() {
+  const data = { logs: state.logs, prs: state.prs, benchmarks: state.benchmarks, exported: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'wodlog-backup-' + new Date().toISOString().split('T')[0] + '.json'; a.click();
+}
+
+function clearAllData() {
+  if (!confirm('Delete ALL data? This cannot be undone.')) return;
+  localStorage.removeItem('wl_logs'); localStorage.removeItem('wl_prs'); localStorage.removeItem('wl_benchmarks');
+  state = { logs: [], prs: [], benchmarks: {} };
+  showToast('All data cleared.', '🗑'); renderWeekGrid(); updateStreak();
+}
+
+// ============================================================
+//  TOAST
+// ============================================================
+function showToast(msg, icon = '✅') {
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').textContent = icon;
+  const t = document.getElementById('toast'); t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ============================================================
+//  DRAG & DROP on dropzone
+// ============================================================
+const dz = document.getElementById('scan-dropzone');
+if (dz) {
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      document.getElementById('scan-file-input').files = e.dataTransfer.files;
+      handleImageUpload({ target: { files: e.dataTransfer.files } });
+    }
+  });
+}
+
+init();
+</script>
+</body>
+</html>
